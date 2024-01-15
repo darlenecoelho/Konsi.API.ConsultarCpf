@@ -13,6 +13,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Konsi.API.ExternalServices\Konsi.API.ExternalServices.csproj" />
+    <ProjectReference Include="..\..\Konsi.Domain\Konsi.Domain.csproj" />
+    <ProjectReference Include="..\..\Konsi.Infrastructure\Konsi.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

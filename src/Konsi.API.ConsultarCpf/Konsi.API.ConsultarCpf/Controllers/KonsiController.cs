@@ -1,4 +1,5 @@
 ﻿using Konsi.API.ExternalServices.Interfaces;
+using Konsi.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Konsi.API.ConsultarCpf.Controllers;
@@ -8,10 +9,12 @@ namespace Konsi.API.ConsultarCpf.Controllers;
 public class KonsiController : ControllerBase
 {
     private readonly IKonsiService _konsiService;
+    private readonly IMessageQueueService _messageQueueService;
 
-    public KonsiController(IKonsiService konsiService)
+    public KonsiController(IKonsiService konsiService, IMessageQueueService messageQueueService)
     {
         _konsiService = konsiService;
+        _messageQueueService = messageQueueService;
     }
 
     [HttpGet("consultar-beneficios/{cpf}")]
@@ -19,7 +22,10 @@ public class KonsiController : ControllerBase
     {
         try
         {
+            await _messageQueueService.PublishCpfAsync(cpf);
             var token = await _konsiService.GetToken();
+            await _messageQueueService.PublishCpfAsync(cpf);
+
             var beneficios = await _konsiService.GetBenefitByCpf(cpf, token);
 
             return Ok(beneficios);

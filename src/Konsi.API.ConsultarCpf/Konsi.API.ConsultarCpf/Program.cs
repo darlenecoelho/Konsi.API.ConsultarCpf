@@ -1,6 +1,9 @@
 using Konsi.API.ExternalServices.AppSettings;
 using Konsi.API.ExternalServices.Interfaces;
 using Konsi.API.ExternalServices.Services;
+using Konsi.Domain.Interfaces;
+using Konsi.Infrastructure.Messaging.Configuration;
+using Konsi.Infrastructure.Messaging.RabbitMQ;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +14,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.Configure<KonsiSettings>(builder.Configuration.GetSection("Konsi"));
+builder.Services.Configure<RabbitMQSettings>(builder.Configuration.GetSection("RabbitMQ"));
+
 builder.Services.AddHttpClient();
+builder.Services.AddSingleton<IMessageQueueService, RabbitMQService>();
 builder.Services.AddTransient<IKonsiService, KonsiService>();
 
 var app = builder.Build();
