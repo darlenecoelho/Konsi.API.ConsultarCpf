@@ -4,6 +4,9 @@ using Konsi.API.ExternalServices.Services;
 using Konsi.Domain.Interfaces;
 using Konsi.Infrastructure.Messaging.Configuration;
 using Konsi.Infrastructure.Messaging.RabbitMQ;
+using Konsi.Infrastructure.Redis.Configuration;
+using Konsi.Infrastructure.Redis.Data;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,10 +18,16 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.Configure<KonsiSettings>(builder.Configuration.GetSection("Konsi"));
 builder.Services.Configure<RabbitMQSettings>(builder.Configuration.GetSection("RabbitMQ"));
+builder.Services.Configure<RedisSettings>(builder.Configuration.GetSection("Redis"));
+var redisConnectionString = builder.Configuration.GetSection("Redis:ConnectionString").Value ?? "localhost";
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
+builder.Services.AddSingleton<CacheService>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<IMessageQueueService, RabbitMQService>();
 builder.Services.AddTransient<IKonsiService, KonsiService>();
+
 
 var app = builder.Build();
 

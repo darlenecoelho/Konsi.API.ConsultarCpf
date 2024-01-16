@@ -3,18 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33829.357
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Konsi.API.ConsultarCpf", "Konsi.API.ConsultarCpf\Konsi.API.ConsultarCpf.csproj", "{98A544F0-24CD-41B7-9575-519B951D94EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Konsi.API.ConsultarCpf", "Konsi.API.ConsultarCpf\Konsi.API.ConsultarCpf.csproj", "{98A544F0-24CD-41B7-9575-519B951D94EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Konsi.API.ExternalServices", "..\Konsi.API.ExternalServices\Konsi.API.ExternalServices.csproj", "{D5A16772-1278-4706-8852-E699A6FB1062}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Konsi.API.ExternalServices", "..\Konsi.API.ExternalServices\Konsi.API.ExternalServices.csproj", "{D5A16772-1278-4706-8852-E699A6FB1062}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Itens de Solução", "Itens de Solução", "{B936388D-02ED-41DC-86A1-19B014961303}"
-	ProjectSection(SolutionItems) = preProject
-		..\..\..\Konsi.API\ChallengeKonsi.API\docker-compose.yml = ..\..\..\Konsi.API\ChallengeKonsi.API\docker-compose.yml
-	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Konsi.Domain", "..\Konsi.Domain\Konsi.Domain.csproj", "{78BD5D38-C491-4C3E-B9E4-9B3EE0B1B14F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Konsi.Domain", "..\Konsi.Domain\Konsi.Domain.csproj", "{78BD5D38-C491-4C3E-B9E4-9B3EE0B1B14F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Konsi.Infrastructure", "..\Konsi.Infrastructure\Konsi.Infrastructure.csproj", "{191563CF-87B5-42AD-A69B-9323AD85461F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Konsi.Infrastructure", "..\Konsi.Infrastructure\Konsi.Infrastructure.csproj", "{191563CF-87B5-42AD-A69B-9323AD85461F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
