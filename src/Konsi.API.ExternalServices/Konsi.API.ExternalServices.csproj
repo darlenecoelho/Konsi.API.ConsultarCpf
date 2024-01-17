@@ -18,4 +18,9 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Konsi.Domain\Konsi.Domain.csproj" />
+    <ProjectReference Include="..\Konsi.Infrastructure\Konsi.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>

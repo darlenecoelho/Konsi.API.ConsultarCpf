@@ -1,9 +1,6 @@
 ﻿using Konsi.API.ExternalServices.Interfaces;
-using Konsi.API.ExternalServices.Response;
 using Konsi.Domain.Interfaces;
-using Konsi.Infrastructure.Redis.Data;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
 
 namespace Konsi.API.ConsultarCpf.Controllers;
 
@@ -12,14 +9,13 @@ namespace Konsi.API.ConsultarCpf.Controllers;
 public class KonsiController : ControllerBase
 {
     private readonly IKonsiService _konsiService;
-    private readonly IMessageQueueService _messageQueueService;
-    private readonly CacheService _cacheService;
+    private readonly IMessageQueueService _messageQueueService;   
 
-    public KonsiController(IKonsiService konsiService, IMessageQueueService messageQueueService, CacheService cacheService)
+
+    public KonsiController(IKonsiService konsiService, IMessageQueueService messageQueueService)
     {
         _konsiService = konsiService;
         _messageQueueService = messageQueueService;
-        _cacheService = cacheService;
     }
 
     [HttpGet("consultar-beneficios/{cpf}")]
@@ -28,20 +24,10 @@ public class KonsiController : ControllerBase
         try
         {
             await _messageQueueService.PublishCpfAsync(cpf);
-            string cachedData = await _cacheService.GetCachedDataAsync(cpf);
-
-            if (!string.IsNullOrEmpty(cachedData))
+            var benefitResponse = await _konsiService.GetBenefitDataByCpf(cpf);
+            if (benefitResponse == null)
             {
-                var benefit = JsonSerializer.Deserialize<BenefitResponse>(cachedData);
-                return Ok(benefit);
-            }
-
-            var token = await _konsiService.GetToken();
-            var benefitResponse = await _konsiService.GetBenefitByCpf(cpf, token);
-
-            if (benefitResponse != null)
-            {
-                await _cacheService.CacheDataAsync(cpf, benefitResponse);
+                return NotFound("Benefícios para o CPF não encontrados.");
             }
 
             return Ok(benefitResponse);

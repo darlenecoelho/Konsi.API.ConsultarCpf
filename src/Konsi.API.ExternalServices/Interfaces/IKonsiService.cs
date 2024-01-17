@@ -5,5 +5,6 @@ namespace Konsi.API.ExternalServices.Interfaces;
 public interface IKonsiService
 {
     Task<string> GetToken();
-    Task<BenefitResponse> GetBenefitByCpf(string cpf, string token);
+    Task<BenefitResponse> GetBenefitDataByCpf(string cpf);
+    Task<BenefitResponse> FetchBenefitByCpf(string cpf, string token);
 }
