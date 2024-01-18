@@ -11,7 +11,7 @@ Konsi API é um sistema backend desenvolvido para consultar benefícios associad
 
 ## Tecnologias UI
 - Vue.js.
--Axios para requisições HTTP.
+- Axios para requisições HTTP.
 - Vue Toast Notification para exibição de mensagens.
 -Tailwind CSS para estilização.
 
