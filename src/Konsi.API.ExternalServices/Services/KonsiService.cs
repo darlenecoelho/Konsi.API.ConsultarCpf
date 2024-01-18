@@ -3,11 +3,11 @@ using Konsi.API.ExternalServices.Interfaces;
 using Konsi.API.ExternalServices.Request;
 using Konsi.API.ExternalServices.Response;
 using Konsi.Domain.Interfaces;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Nest;
 using System.Net.Http.Json;
 using System.Text.Json;
-using Konsi.Infrastructure.Redis.Data;
-using Microsoft.Extensions.Logging;
 
 namespace Konsi.API.ExternalServices.Services;
 
@@ -15,22 +15,27 @@ public class KonsiService : IKonsiService
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly KonsiSettings _settings;
-    private readonly CacheService _cacheService;
+    private readonly ICacheService _cacheService;
     private readonly IElasticsearchService _elasticsearchService;
     private readonly ILogger<KonsiService> _logger;
+    private readonly IElasticClient _elasticClient;
 
-    public KonsiService(IHttpClientFactory httpClientFactory, IOptions<KonsiSettings> settings, CacheService cacheService, IElasticsearchService elasticsearchService, ILogger<KonsiService> logger)
+
+    public KonsiService(IHttpClientFactory httpClientFactory, IOptions<KonsiSettings> settings,
+                       ICacheService cacheService, IElasticsearchService elasticsearchService,
+                       IElasticClient elasticClient, ILogger<KonsiService> logger)
     {
         _httpClientFactory = httpClientFactory;
         _settings = settings.Value;
         _cacheService = cacheService;
         _elasticsearchService = elasticsearchService;
         _logger = logger;
+        _elasticClient = elasticClient;
     }
 
     public async Task<string> GetToken()
     {
-        _logger.LogInformation("Iniciando o processo de obter o token de acesso");
+        _logger.LogInformation("Obtendo token de acesso...");
 
         var credentials = new TokenRequest
         {
@@ -99,4 +104,34 @@ public class KonsiService : IKonsiService
 
         return await response.Content.ReadFromJsonAsync<BenefitResponse>();
     }
+
+    public async Task<BenefitResponse> GetBenefitDataFromElasticsearchByCpf(string cpf)
+    {
+        _logger.LogInformation($"Buscando dados de benefício do CPF {cpf} no Elasticsearch.");
+        var searchResponse = await SearchBenefitDataAsync(cpf);
+
+        if (!searchResponse.IsValid || !searchResponse.Documents.Any())
+        {
+            _logger.LogWarning($"Nenhum dado encontrado no Elasticsearch para o CPF {cpf}.");
+            return null;
+        }
+
+        _logger.LogInformation($"Dados encontrados e retornados do Elasticsearch para o CPF {cpf}.");
+        return searchResponse.Documents.First();
+    }
+
+    private async Task<ISearchResponse<BenefitResponse>> SearchBenefitDataAsync(string cpf)
+    {
+        return await _elasticClient.SearchAsync<BenefitResponse>(s => s
+            .Index("benefits")
+            .Query(q => q
+                .Match(m => m.Field(f => f.Data.Cpf).Query(cpf))
+            )
+        );
+    }
 }
+
+
+
+
+

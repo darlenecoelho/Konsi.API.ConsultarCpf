@@ -1,6 +1,6 @@
 ﻿using Konsi.Domain.Interfaces;
 using Konsi.Infrastructure.Messaging.Configuration;
-using Konsi.Infrastructure.Redis.Data;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using System.Text;
@@ -10,43 +10,55 @@ namespace Konsi.Infrastructure.Messaging.RabbitMQ;
 public class RabbitMQService : IMessageQueueService
 {
     private readonly RabbitMQSettings _settings;
-    private readonly CacheService _cacheService;
+    private readonly ICacheService _cacheService;
+    private readonly ILogger<RabbitMQService> _logger;
 
-    public RabbitMQService(IOptions<RabbitMQSettings> settings, CacheService cacheService)
+
+    public RabbitMQService(IOptions<RabbitMQSettings> settings, ICacheService cacheService, ILogger<RabbitMQService> logger)
     {
         _settings = settings.Value;
         _cacheService = cacheService;
+        _logger = logger;
+
     }
 
     public async Task PublishCpfAsync(string cpf)
     {
-        string cachedData = await _cacheService.GetCachedDataAsync(cpf);
-        if (!string.IsNullOrEmpty(cachedData))
+        if (string.IsNullOrWhiteSpace(cpf))
+            throw new ArgumentException("O campo CPF não pode ser nulo", nameof(cpf));
+
+        try
         {
-            // Se os dados já estiverem no cache, não é necessário publicar na fila
-            return;
+            await _cacheService.GetCachedDataAsync(cpf);
+
+            var factory = new ConnectionFactory()
+            {
+                HostName = _settings.HostName,
+                UserName = _settings.UserName,
+                Password = _settings.Password
+            };
+
+            using var connection = factory.CreateConnection();
+            using var channel = connection.CreateModel();
+
+            channel.QueueDeclare(queue: _settings.QueueName,
+                                 durable: false,
+                                 exclusive: false,
+                                 autoDelete: false,
+                                 arguments: null);
+
+            var body = Encoding.UTF8.GetBytes(cpf);
+
+            channel.BasicPublish(exchange: "",
+                                 routingKey: _settings.QueueName,
+                                 basicProperties: null, body: body);
+
+            _logger.LogInformation($"CPF {cpf} publicado {_settings.QueueName} na fila com sucesso.");
         }
-
-        var factory = new ConnectionFactory()
+        catch (Exception ex)
         {
-            HostName = _settings.HostName,
-            UserName = _settings.UserName,
-            Password = _settings.Password
-        };
-
-        using var connection = factory.CreateConnection();
-        using var channel = connection.CreateModel();
-
-        channel.QueueDeclare(queue: _settings.QueueName,
-                             durable: false,
-                             exclusive: false,
-                             autoDelete: false,
-                             arguments: null);
-
-        var body = Encoding.UTF8.GetBytes(cpf);
-
-        channel.BasicPublish(exchange: "",
-                             routingKey: _settings.QueueName,
-                            basicProperties: null, body: body);
+            _logger.LogError(ex, $"Erroao publicar o {cpf} em {_settings.QueueName}.");
+            throw;
+        }
     }
 }

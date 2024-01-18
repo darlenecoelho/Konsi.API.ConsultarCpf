@@ -1,9 +1,10 @@
-﻿using StackExchange.Redis;
+﻿using Konsi.Domain.Interfaces;
+using StackExchange.Redis;
 using System.Text.Json;
 
 namespace Konsi.Infrastructure.Redis.Data;
 
-public class CacheService
+public class CacheService : ICacheService
 {
     private readonly IConnectionMultiplexer _redisConnection;
 

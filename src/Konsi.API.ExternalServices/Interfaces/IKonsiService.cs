@@ -7,4 +7,5 @@ public interface IKonsiService
     Task<string> GetToken();
     Task<BenefitResponse> GetBenefitDataByCpf(string cpf);
     Task<BenefitResponse> FetchBenefitByCpf(string cpf, string token);
+    Task<BenefitResponse> GetBenefitDataFromElasticsearchByCpf(string cpf);
 }

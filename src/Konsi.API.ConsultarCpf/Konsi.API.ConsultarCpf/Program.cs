@@ -24,20 +24,27 @@ builder.Services.Configure<RabbitMQSettings>(builder.Configuration.GetSection("R
 builder.Services.Configure<RedisSettings>(builder.Configuration.GetSection("Redis"));
 var redisConnectionString = builder.Configuration.GetSection("Redis:ConnectionString").Value ?? "localhost";
 
-
 var elasticsearchSettings = builder.Configuration.GetSection("Elasticsearch").Get<ElasticsearchSettings>();
 var settings = new ConnectionSettings(new Uri(elasticsearchSettings.Uri));
 var elasticClient = new ElasticClient(settings);
 builder.Services.AddSingleton<IElasticClient>(elasticClient);
 builder.Services.AddSingleton<IElasticsearchService, ElasticsearchService>();
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
-builder.Services.AddSingleton<CacheService>();
+builder.Services.AddSingleton<ICacheService, CacheService>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<IMessageQueueService, RabbitMQService>();
 builder.Services.AddTransient<IKonsiService, KonsiService>();
 builder.Services.AddLogging();
-
+builder.Services.AddCors(option =>
+{
+    option.AddPolicy("MyPolicy", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
 
 var app = builder.Build();
 
@@ -47,6 +54,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("MyPolicy");
 
 app.UseHttpsRedirection();
 
