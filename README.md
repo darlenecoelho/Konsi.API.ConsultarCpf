@@ -9,7 +9,7 @@ Tecnologias Backend:
 - RabbitMQ para gerenciamento de filas de mensagens.
 - Docker e Docker Compose para containerização e orquestração.
 
-  ## Executando a aplicação usando o Docker
+## Executando a aplicação usando o Docker
 
 Após executar o comando no terminal `docker-compose up --build`, basta abrir a url no navegador: `http://localhost:8000/swagger/`.
 
