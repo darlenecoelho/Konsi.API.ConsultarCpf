@@ -32,6 +32,18 @@ Senha padrão: guest
 
 Essa interface permite monitorar filas, mensagens, conexões, entre outras funcionalidades.
 
+## Variáveis de Ambiente
+Defina as seguintes variáveis para configurar credenciais e conexões:
+
+- `KONSI_API_URL` – URL para geração do token.
+- `KONSI_USERNAME` – usuário para autenticação na API Konsi.
+- `KONSI_PASSWORD` – senha da API Konsi.
+- `KONSI_API_URL_CPF` – endpoint para consulta de benefícios.
+- `RABBITMQ_HOST` – host do RabbitMQ.
+- `RABBITMQ_USER` – usuário do RabbitMQ.
+- `RABBITMQ_PASSWORD` – senha do RabbitMQ.
+- `RABBITMQ_QUEUE` – nome da fila utilizada para envio de CPFs.
+
 ## Uso da API:
 
 - Consulta de Benefícios
